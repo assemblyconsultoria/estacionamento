@@ -16,22 +16,22 @@ import com.assemblyconsultoria.estacionamento.repository.ClienteRepository;
 
 
 @Controller
-@RequestMapping("/clientes")
+@RequestMapping("/cliente")
 public class ClienteController {
     
     @Autowired
     private ClienteRepository clienteRepository;
 
-    @GetMapping
+    @GetMapping()
     public String getAllClientes(Model model) {
-        model.addAttribute("clientes", clienteRepository.findAll());
-        return "clientes/list";
+        model.addAttribute("cliente", clienteRepository.findAll());
+        return "cliente";
     }
 
     @PostMapping()
     public String createCliente(@ModelAttribute Cliente cliente) {
         clienteRepository.save(cliente);
-        return "redirect:/clientes";
+        return "redirect:/cliente";
     }
     
     @PutMapping
@@ -41,13 +41,13 @@ public class ClienteController {
         }
         cliente.setId(id);
         clienteRepository.save(cliente);
-        return "redirect:/clientes";
+        return "redirect:/cliente";
     }
 
     @DeleteMapping
     public String deleteCliente(@PathVariable Long id) {
         clienteRepository.deleteById(id);
-        return "redirect:/clientes";
+        return "redirect:/cliente";
 
     }
 }
