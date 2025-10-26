@@ -53,10 +53,15 @@ export class CheckoutModal implements OnInit {
   }
 
   confirmarRetirada(): void {
-    const result = this.parkingService.checkoutVehicle(this.vehicle.id);
-    if (result) {
-      this.checkout.emit();
-    }
+    this.parkingService.checkoutVehicle(this.vehicle.id).subscribe({
+      next: (vehicle) => {
+        this.checkout.emit();
+      },
+      error: (error) => {
+        console.error('Erro ao processar retirada:', error);
+        alert('Erro ao processar retirada. Tente novamente.');
+      }
+    });
   }
 
   onClose(): void {

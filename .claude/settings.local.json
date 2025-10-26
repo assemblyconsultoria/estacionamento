@@ -6,7 +6,12 @@
       "Bash(ng version:*)",
       "Bash(ng new:*)",
       "Bash(ng generate:*)",
-      "Bash(ng build:*)"
+      "Bash(ng build:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(psql:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

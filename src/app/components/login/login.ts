@@ -38,12 +38,17 @@ export class Login {
       return;
     }
 
-    const success = this.authService.login(this.usuario, this.senha);
-
-    if (success) {
-      this.router.navigate(['/parking']);
-    } else {
-      this.errorMessage = 'Credenciais inválidas. Tente novamente.';
-    }
+    this.authService.login(this.usuario, this.senha).subscribe({
+      next: (success) => {
+        if (success) {
+          this.router.navigate(['/parking']);
+        } else {
+          this.errorMessage = 'Credenciais inválidas. Tente novamente.';
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.message || 'Erro ao fazer login. Tente novamente.';
+      }
+    });
   }
 }

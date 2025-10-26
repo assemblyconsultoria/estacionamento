@@ -44,3 +44,12 @@ Thumbs.db
 
 # Claude AI
 .md
+
+# Backend
+/backend/node_modules
+/backend/.env
+/backend/*.log
+
+# Environment files
+.env
+.env.local

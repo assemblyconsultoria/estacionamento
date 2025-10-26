@@ -1,12 +1,36 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 import { Vehicle } from '../models/vehicle.model';
+import { environment } from '../../environments/environment';
+import { Auth } from './auth';
+
+interface VehicleResponse {
+  success: boolean;
+  vehicle?: Vehicle;
+  vehicles?: Vehicle[];
+  count?: number;
+  message?: string;
+}
+
+interface CheckoutResponse {
+  success: boolean;
+  message: string;
+  vehicle: Vehicle;
+}
+
+interface CalculateResponse {
+  success: boolean;
+  vehicle: Vehicle;
+  valor_total: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class Parking {
-  private vehicles: Vehicle[] = [];
+  private apiUrl = environment.apiUrl;
   private vehiclesSubject = new BehaviorSubject<Vehicle[]>([]);
   public vehicles$: Observable<Vehicle[]> = this.vehiclesSubject.asObservable();
 
@@ -14,30 +38,75 @@ export class Parking {
   private readonly VALOR_POR_HORA = 5.00;
   private readonly VALOR_MINIMO = 5.00;
 
-  constructor() {
-    this.loadVehicles();
+  constructor(
+    private http: HttpClient,
+    private auth: Auth
+  ) {
+    // Load vehicles on service initialization if authenticated
+    if (this.auth.isAuthenticated()) {
+      this.loadVehicles();
+    }
   }
 
-  addVehicle(marca: string, modelo: string, placa: string): void {
-    const vehicle: Vehicle = {
-      id: this.generateId(),
+  private getHeaders(): HttpHeaders {
+    const token = this.auth.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  addVehicle(marca: string, modelo: string, placa: string): Observable<Vehicle> {
+    return this.http.post<VehicleResponse>(`${this.apiUrl}/vehicles`, {
       marca,
       modelo,
-      placa: placa.toUpperCase(),
-      dataEntrada: new Date(),
-      status: 'estacionado'
-    };
+      placa
+    }, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.success && response.vehicle) {
+          // Convert date strings to Date objects
+          const vehicle = this.convertDates(response.vehicle);
 
-    this.vehicles.push(vehicle);
-    this.saveVehicles();
+          // Reload vehicles to update the list
+          this.loadVehicles();
+
+          return vehicle;
+        }
+        throw new Error('Failed to add vehicle');
+      }),
+      catchError(this.handleError)
+    );
   }
 
-  getEstacionados(): Vehicle[] {
-    return this.vehicles.filter(v => v.status === 'estacionado');
+  getEstacionados(): Observable<Vehicle[]> {
+    return this.http.get<VehicleResponse>(`${this.apiUrl}/vehicles/estacionados`, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.success && response.vehicles) {
+          return response.vehicles.map(v => this.convertDates(v));
+        }
+        return [];
+      }),
+      tap(vehicles => this.vehiclesSubject.next(vehicles)),
+      catchError(this.handleError)
+    );
   }
 
-  getVehicleById(id: string): Vehicle | undefined {
-    return this.vehicles.find(v => v.id === id);
+  getVehicleById(id: string): Observable<Vehicle | undefined> {
+    return this.http.get<VehicleResponse>(`${this.apiUrl}/vehicles/${id}`, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.success && response.vehicle) {
+          return this.convertDates(response.vehicle);
+        }
+        return undefined;
+      }),
+      catchError(this.handleError)
+    );
   }
 
   calcularValor(vehicle: Vehicle): number {
@@ -60,41 +129,73 @@ export class Parking {
     return Math.max(valor, this.VALOR_MINIMO);
   }
 
-  checkoutVehicle(id: string): Vehicle | null {
-    const vehicle = this.getVehicleById(id);
-    if (!vehicle || vehicle.status === 'retirado') {
-      return null;
-    }
+  checkoutVehicle(id: string): Observable<Vehicle> {
+    return this.http.put<CheckoutResponse>(`${this.apiUrl}/vehicles/${id}/checkout`, {}, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.success && response.vehicle) {
+          const vehicle = this.convertDates(response.vehicle);
 
-    vehicle.dataSaida = new Date();
-    vehicle.valorTotal = this.calcularValor(vehicle);
-    vehicle.status = 'retirado';
+          // Reload vehicles to update the list
+          this.loadVehicles();
 
-    this.saveVehicles();
-    return vehicle;
-  }
-
-  private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+          return vehicle;
+        }
+        throw new Error('Failed to checkout vehicle');
+      }),
+      catchError(this.handleError)
+    );
   }
 
   private loadVehicles(): void {
-    const stored = localStorage.getItem('vehicles');
-    if (stored) {
-      this.vehicles = JSON.parse(stored);
-      // Converte strings de data para objetos Date
-      this.vehicles.forEach(v => {
-        v.dataEntrada = new Date(v.dataEntrada);
-        if (v.dataSaida) {
-          v.dataSaida = new Date(v.dataSaida);
-        }
-      });
-    }
-    this.vehiclesSubject.next(this.vehicles);
+    this.getEstacionados().subscribe({
+      next: (vehicles) => {
+        // Vehicles are already updated via tap() in getEstacionados
+      },
+      error: (error) => {
+        console.error('Error loading vehicles:', error);
+        this.vehiclesSubject.next([]);
+      }
+    });
   }
 
-  private saveVehicles(): void {
-    localStorage.setItem('vehicles', JSON.stringify(this.vehicles));
-    this.vehiclesSubject.next(this.vehicles);
+  private convertDates(vehicle: any): Vehicle {
+    return {
+      ...vehicle,
+      dataEntrada: new Date(vehicle.data_entrada),
+      dataSaida: vehicle.data_saida ? new Date(vehicle.data_saida) : undefined,
+      valorTotal: vehicle.valor_total
+    };
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'Ocorreu um erro desconhecido';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Erro: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = error.error?.error || error.error?.message || `Erro ${error.status}: ${error.message}`;
+    }
+
+    console.error('Parking service error:', errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+
+  // Get all vehicles (not just parked)
+  getAllVehicles(): Observable<Vehicle[]> {
+    return this.http.get<VehicleResponse>(`${this.apiUrl}/vehicles`, {
+      headers: this.getHeaders()
+    }).pipe(
+      map(response => {
+        if (response.success && response.vehicles) {
+          return response.vehicles.map(v => this.convertDates(v));
+        }
+        return [];
+      }),
+      catchError(this.handleError)
+    );
   }
 }

@@ -35,12 +35,14 @@ export class AddVehicleModal {
       return;
     }
 
-    try {
-      this.parkingService.addVehicle(this.marca, this.modelo, this.placa);
-      this.vehicleAdded.emit();
-    } catch (error) {
-      this.errorMessage = 'Erro ao adicionar veículo. Tente novamente.';
-    }
+    this.parkingService.addVehicle(this.marca, this.modelo, this.placa).subscribe({
+      next: (vehicle) => {
+        this.vehicleAdded.emit();
+      },
+      error: (error) => {
+        this.errorMessage = error.message || 'Erro ao adicionar veículo. Tente novamente.';
+      }
+    });
   }
 
   onClose(): void {
