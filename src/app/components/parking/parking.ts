@@ -35,7 +35,15 @@ export class Parking implements OnInit {
   }
 
   loadVehicles(): void {
-    this.vehicles = this.parkingService.getEstacionados();
+    this.parkingService.getEstacionados().subscribe({
+      next: (vehicles) => {
+        this.vehicles = vehicles;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar veículos:', error);
+        this.vehicles = [];
+      }
+    });
   }
 
   openAddModal(): void {

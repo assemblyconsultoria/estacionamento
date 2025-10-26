@@ -23,7 +23,7 @@ echo ""
 
 # Get database credentials
 DB_USER="${DB_USER:-postgres}"
-DB_NAME="projetos"
+DB_NAME="estacionamento"
 
 echo "Setting up database '$DB_NAME'..."
 echo ""

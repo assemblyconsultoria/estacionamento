@@ -11,7 +11,9 @@
       "Bash(npm init:*)",
       "Bash(npm install:*)",
       "Bash(psql:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(test:*)",
+      "Bash(PGPASSWORD=postgres123 psql:*)"
     ],
     "deny": [],
     "ask": []
