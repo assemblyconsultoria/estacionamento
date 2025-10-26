@@ -1,0 +1,52 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Retirada de Veículo</h2>
+      <button class="btn-close" (click)="onClose()" aria-label="Fechar">
+        &times;
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="vehicle-summary">
+        <div class="vehicle-icon">🚗</div>
+        <div class="vehicle-details">
+          <div class="plate">{{ vehicle.placa }}</div>
+          <div class="info">{{ vehicle.marca }} {{ vehicle.modelo }}</div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-row">
+          <span class="label">Entrada:</span>
+          <span class="value">{{ vehicle.dataEntrada | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Tempo estacionado:</span>
+          <span class="value highlight">{{ tempoTotal }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Horas cobradas:</span>
+          <span class="value">{{ horasCobranca }}h</span>
+        </div>
+      </div>
+
+      <div class="payment-section">
+        <div class="payment-label">Valor a pagar:</div>
+        <div class="payment-value">R$ {{ valorTotal | number:'1.2-2' }}</div>
+        <div class="payment-info">
+          <small>* Cobrança de R$ 5,00 por hora iniciada</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onClose()">
+        Cancelar
+      </button>
+      <button type="button" class="btn-confirm" (click)="confirmarRetirada()">
+        Confirmar Retirada
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,79 @@
+<div class="parking-container">
+  <header class="parking-header">
+    <div class="header-content">
+      <h1>Sistema de Estacionamento</h1>
+      <div class="user-info">
+        <span>Bem-vindo, {{ usuario }}</span>
+        <button class="btn-logout" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="parking-main">
+    <div class="actions-bar">
+      <button class="btn-add" (click)="openAddModal()">
+        + Adicionar Veículo
+      </button>
+      <div class="total-vehicles">
+        Total de veículos: {{ vehicles.length }}
+      </div>
+    </div>
+
+    @if (vehicles.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🚗</div>
+        <h2>Nenhum veículo estacionado</h2>
+        <p>Clique em "Adicionar Veículo" para registrar um novo veículo no estacionamento.</p>
+      </div>
+    } @else {
+      <div class="vehicles-grid">
+        @for (vehicle of vehicles; track vehicle.id) {
+          <div class="vehicle-card">
+            <div class="vehicle-header">
+              <div class="vehicle-icon">🚗</div>
+              <div class="vehicle-plate">{{ vehicle.placa }}</div>
+            </div>
+
+            <div class="vehicle-info">
+              <div class="info-row">
+                <span class="label">Marca:</span>
+                <span class="value">{{ vehicle.marca }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Modelo:</span>
+                <span class="value">{{ vehicle.modelo }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Entrada:</span>
+                <span class="value">{{ vehicle.dataEntrada | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Tempo:</span>
+                <span class="value time">{{ getTempoEstacionado(vehicle) }}</span>
+              </div>
+            </div>
+
+            <button class="btn-checkout" (click)="openCheckoutModal(vehicle)">
+              Retirada
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>
+
+@if (showAddModal) {
+  <app-add-vehicle-modal
+    (close)="closeAddModal()"
+    (vehicleAdded)="onVehicleAdded()">
+  </app-add-vehicle-modal>
+}
+
+@if (showCheckoutModal && selectedVehicle) {
+  <app-checkout-modal
+    [vehicle]="selectedVehicle"
+    (close)="closeCheckoutModal()"
+    (checkout)="onVehicleCheckedOut()">
+  </app-checkout-modal>
+}

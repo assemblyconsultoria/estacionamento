@@ -1,0 +1,86 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Auth } from '../../services/auth';
+import { Parking as ParkingService } from '../../services/parking';
+import { Vehicle } from '../../models/vehicle.model';
+import { AddVehicleModal } from '../add-vehicle-modal/add-vehicle-modal';
+import { CheckoutModal } from '../checkout-modal/checkout-modal';
+
+@Component({
+  selector: 'app-parking',
+  imports: [CommonModule, AddVehicleModal, CheckoutModal],
+  templateUrl: './parking.html',
+  styleUrl: './parking.scss',
+})
+export class Parking implements OnInit {
+  vehicles: Vehicle[] = [];
+  usuario: string | null = '';
+  showAddModal = false;
+  showCheckoutModal = false;
+  selectedVehicle: Vehicle | null = null;
+
+  constructor(
+    private authService: Auth,
+    private parkingService: ParkingService
+  ) {}
+
+  ngOnInit(): void {
+    this.usuario = this.authService.getUsuario();
+    this.loadVehicles();
+
+    // Inscreve-se para atualizações automáticas
+    this.parkingService.vehicles$.subscribe(vehicles => {
+      this.vehicles = vehicles.filter(v => v.status === 'estacionado');
+    });
+  }
+
+  loadVehicles(): void {
+    this.vehicles = this.parkingService.getEstacionados();
+  }
+
+  openAddModal(): void {
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+  }
+
+  onVehicleAdded(): void {
+    this.closeAddModal();
+    this.loadVehicles();
+  }
+
+  openCheckoutModal(vehicle: Vehicle): void {
+    this.selectedVehicle = vehicle;
+    this.showCheckoutModal = true;
+  }
+
+  closeCheckoutModal(): void {
+    this.showCheckoutModal = false;
+    this.selectedVehicle = null;
+  }
+
+  onVehicleCheckedOut(): void {
+    this.closeCheckoutModal();
+    this.loadVehicles();
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+
+  getTempoEstacionado(vehicle: Vehicle): string {
+    const entrada = new Date(vehicle.dataEntrada);
+    const agora = new Date();
+    const diff = agora.getTime() - entrada.getTime();
+
+    const horas = Math.floor(diff / (1000 * 60 * 60));
+    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (horas === 0) {
+      return `${minutos} min`;
+    }
+    return `${horas}h ${minutos}min`;
+  }
+}

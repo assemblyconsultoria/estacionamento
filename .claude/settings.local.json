@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version:*)",
+      "Bash(npm --version)",
+      "Bash(ng version:*)",
+      "Bash(ng new:*)",
+      "Bash(ng generate:*)",
+      "Bash(ng build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
