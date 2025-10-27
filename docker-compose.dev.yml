@@ -6,7 +6,7 @@ version: '3.8'
 services:
   database:
     ports:
-      - "5432:5432"
+      - "5430:5432"
     environment:
       POSTGRES_DB: estacionamento
       POSTGRES_USER: postgres

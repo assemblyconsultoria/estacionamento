@@ -32,7 +32,10 @@ Your parking management system now has a complete, production-ready Docker confi
 
 ### 1. PostgreSQL Database (estacionamento-db)
 - **Image**: postgres:16-alpine
-- **Port**: 5432
+- **Port**: 5430:5432 (host:container)
+  - External access (from host): `localhost:5430`
+  - Internal access (from containers): `database:5432`
+  - Port 5430 avoids conflicts with local PostgreSQL installations
 - **Volume**: estacionamento-postgres-data (persistent)
 - **Initialization**: Automatic via docker-init.sql
 - **Health Check**: pg_isready every 10s
@@ -125,7 +128,7 @@ DB_PASSWORD=postgres123                    # CHANGE IN PRODUCTION!
 # Ports
 FRONTEND_PORT=4200
 BACKEND_PORT=3000
-DB_PORT=5432
+DB_PORT=5430  # External port (avoids conflict with local PostgreSQL on 5432)
 
 # JWT
 JWT_SECRET=change-this-secret-in-production  # CRITICAL: CHANGE THIS!
@@ -176,8 +179,11 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 ### Database Management
 ```bash
-# Connect to PostgreSQL
+# Connect to PostgreSQL (from inside Docker)
 docker-compose exec database psql -U postgres -d estacionamento
+
+# Connect from host machine (external access)
+psql -h localhost -p 5430 -U postgres -d estacionamento
 
 # Backup
 docker-compose exec -T database pg_dump -U postgres estacionamento > backup.sql

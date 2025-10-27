@@ -93,7 +93,7 @@ docker-compose up -d --build
 ┌──────────────▼──────────────────────┐
 │  Database (PostgreSQL 16)           │
 │  Container: estacionamento-db       │
-│  Port: 5432:5432                    │
+│  Port: 5430:5432 (host:container)  │
 │  Database: estacionamento           │
 └─────────────────────────────────────┘
 ```
@@ -122,7 +122,7 @@ DB_PASSWORD=postgres123  # Mude em producao!
 # Ports
 FRONTEND_PORT=4200
 BACKEND_PORT=3000
-DB_PORT=5432
+DB_PORT=5430  # External port (avoids conflict with local PostgreSQL on 5432)
 
 # JWT (CRITICO: mude em producao!)
 JWT_SECRET=seu-segredo-super-secreto-aqui
@@ -135,8 +135,15 @@ FRONTEND_URL=http://localhost:4200
 ## Gerenciamento do Banco de Dados
 
 ### Acessar o PostgreSQL
+
+Atraves do container:
 ```bash
 docker-compose exec database psql -U postgres -d estacionamento
+```
+
+Ou direto do host (porta 5430):
+```bash
+psql -h localhost -p 5430 -U postgres -d estacionamento
 ```
 
 ### Backup do Banco

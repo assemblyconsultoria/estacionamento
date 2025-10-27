@@ -49,8 +49,9 @@ Use this checklist to verify your Docker setup is complete and ready for deploym
     openssl rand -base64 32
     ```
   - [ ] Change DB_PASSWORD (if needed)
-  - [ ] Verify ports are available (4200, 3000, 5432)
+  - [ ] Verify ports are available (4200, 3000, 5430)
   - [ ] Set FRONTEND_URL if different from localhost
+  - [ ] Note: PostgreSQL uses port 5430 externally to avoid conflicts with local installations
 
 ### 2. Build and Start
 
@@ -72,9 +73,15 @@ Use this checklist to verify your Docker setup is complete and ready for deploym
 
 ### 3. Verify Services
 
-- [ ] Check database:
+- [ ] Check database (from Docker):
   ```bash
   docker-compose exec database psql -U postgres -d estacionamento -c "\dt"
+  # Should show: users, vehicles tables
+  ```
+
+- [ ] Check database (from host):
+  ```bash
+  psql -h localhost -p 5430 -U postgres -d estacionamento -c "\dt"
   # Should show: users, vehicles tables
   ```
 
@@ -303,7 +310,7 @@ Use this checklist to verify your Docker setup is complete and ready for deploym
   ```bash
   sudo lsof -i :4200
   sudo lsof -i :3000
-  sudo lsof -i :5432
+  sudo lsof -i :5430  # PostgreSQL external port
   ```
 
 - [ ] View service logs:
@@ -323,9 +330,14 @@ Use this checklist to verify your Docker setup is complete and ready for deploym
   docker-compose logs database
   ```
 
-- [ ] Test connection:
+- [ ] Test connection (from Docker):
   ```bash
   docker-compose exec database psql -U postgres -d estacionamento -c "SELECT 1;"
+  ```
+
+- [ ] Test connection (from host):
+  ```bash
+  psql -h localhost -p 5430 -U postgres -d estacionamento -c "SELECT 1;"
   ```
 
 - [ ] Verify environment variables:

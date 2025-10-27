@@ -15,7 +15,10 @@
       "Bash(test:*)",
       "Bash(PGPASSWORD=postgres123 psql:*)",
       "Bash(docker-compose config:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(./verify-port-config.sh:*)",
+      "Bash(bash:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

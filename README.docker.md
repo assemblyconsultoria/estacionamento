@@ -101,7 +101,7 @@ This command will:
 
 - **Frontend**: http://localhost:4200
 - **Backend API**: http://localhost:3000
-- **Database**: localhost:5432
+- **Database**: localhost:5430 (external access from host machine)
 
 ### 4. Create Your First User
 
@@ -143,7 +143,7 @@ Edit your `.env` file with production values:
 DB_NAME=estacionamento
 DB_USER=postgres
 DB_PASSWORD=your_secure_password_here
-DB_PORT=5432
+DB_PORT=5430  # External port (avoids conflict with local PostgreSQL on 5432)
 
 # Backend Configuration
 BACKEND_PORT=3000
@@ -219,7 +219,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 - **Frontend**: http://localhost:4200 (with hot-reload)
 - **Backend API**: http://localhost:3000 (with nodemon)
-- **Database**: localhost:5432
+- **Database**: localhost:5430 (external access from host machine)
 
 ## Environment Configuration
 
@@ -230,7 +230,7 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml down
 | `DB_NAME` | PostgreSQL database name | estacionamento | Yes |
 | `DB_USER` | PostgreSQL username | postgres | Yes |
 | `DB_PASSWORD` | PostgreSQL password | postgres123 | Yes |
-| `DB_PORT` | PostgreSQL port | 5432 | No |
+| `DB_PORT` | PostgreSQL external port (host) | 5430 | No |
 | `BACKEND_PORT` | Backend service port | 3000 | No |
 | `FRONTEND_PORT` | Frontend service port | 4200 | No |
 | `JWT_SECRET` | Secret key for JWT tokens | (must change) | Yes |
@@ -244,7 +244,7 @@ To run on different ports, edit your `.env` file:
 ```env
 FRONTEND_PORT=8080
 BACKEND_PORT=8000
-DB_PORT=5433
+DB_PORT=5431  # External port for host access
 ```
 
 Then restart services:
@@ -335,16 +335,22 @@ docker-compose exec frontend sh
 
 The database is accessible at:
 - **Host**: localhost (from host machine) or `database` (from containers)
-- **Port**: 5432
+- **Port**: 5430 (from host machine) or 5432 (from inside containers)
 - **Database**: estacionamento
 - **User**: postgres
 - **Password**: (from .env file)
+
+**Important Port Mapping:**
+- External (host machine): `localhost:5430` - Use when connecting from outside Docker
+- Internal (container network): `database:5432` - Used by backend container
+- Port 5430 is used externally to avoid conflicts with local PostgreSQL installations
 
 ### Connect to Database
 
 #### From Host Machine
 ```bash
-psql -h localhost -p 5432 -U postgres -d estacionamento
+# Use port 5430 for external access (avoids conflict with local PostgreSQL)
+psql -h localhost -p 5430 -U postgres -d estacionamento
 ```
 
 #### From Docker Container
@@ -582,7 +588,7 @@ The application consists of three main services:
 │  Database (PostgreSQL)                         │
 │  - Container: estacionamento-db                │
 │  - Image: postgres:16-alpine                   │
-│  - Port: 5432                                  │
+│  - Port: 5430:5432 (host:container)           │
 │  - Volume: estacionamento-postgres-data        │
 │                                                 │
 └─────────────────────────────────────────────────┘
