@@ -13,7 +13,9 @@
       "Bash(psql:*)",
       "Bash(chmod:*)",
       "Bash(test:*)",
-      "Bash(PGPASSWORD=postgres123 psql:*)"
+      "Bash(PGPASSWORD=postgres123 psql:*)",
+      "Bash(docker-compose config:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
