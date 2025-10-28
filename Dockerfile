@@ -82,7 +82,7 @@ RUN addgroup -g 1001 -S appuser && \
     chown -R appuser:appuser /backend /frontend /var/log/supervisor /var/lib/nginx /var/log/nginx
 
 # Expose ports
-EXPOSE 80 3000
+EXPOSE 3000 3000
 
 # Health check - check both frontend and backend
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
