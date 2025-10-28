@@ -1,54 +1,152 @@
 # Sistema de Gerenciamento de Estacionamento
 
-Sistema completo de gerenciamento de estacionamento desenvolvido com Angular 20, com interface responsiva e moderna.
+Sistema completo de gerenciamento de estacionamento desenvolvido com Angular 20 e Node.js, com interface responsiva e moderna.
 
 ## Funcionalidades
 
-- **Autenticação de Usuários**: Sistema de login seguro com validação
+- **Autenticação de Usuários**: Sistema de login seguro com JWT e validação
 - **Gestão de Veículos**: Registro de entrada com marca, modelo e placa
 - **Controle de Tempo**: Monitoramento automático do tempo de permanência
 - **Cálculo Automático**: Geração de valores baseado em R$ 5,00/hora
 - **Retirada de Veículos**: Modal com detalhamento de valores a pagar
 - **Interface Responsiva**: Adaptável para desktop, tablet e mobile
-- **Persistência de Dados**: Armazenamento local dos dados
+- **Persistência de Dados**: Banco de dados PostgreSQL
+- **API REST**: Backend completo com autenticação e validação
 
 ## Tecnologias Utilizadas
 
+### Frontend
 - Angular 20.3.7
 - TypeScript
 - SCSS
 - RxJS
-- LocalStorage para persistência
+
+### Backend
+- Node.js 20
+- Express 5
+- PostgreSQL 16
+- JWT Authentication
+- bcrypt para hash de senhas
+
+### DevOps
+- Docker & Docker Compose
+- Nginx
+- Multi-stage builds
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
 
 ## Instalação
 
-1. Clone o repositório
-2. Instale as dependências:
+### Opção 1: Usando Docker (Recomendado)
+
+A forma mais rápida de executar o projeto completo:
+
+1. Clone o repositório:
+```bash
+git clone <repository-url>
+cd estacionamento
+```
+
+2. Configure as variáveis de ambiente (opcional):
+```bash
+cp backend/.env.example backend/.env
+# Edite o .env se necessário
+```
+
+3. Inicie os containers:
+```bash
+docker-compose up -d
+```
+
+4. Acesse a aplicação:
+   - Frontend: http://localhost:9091
+   - Backend API: http://localhost:3001/health
+
+5. **Login inicial (Docker)**:
+   - Usuário: `admin`
+   - Senha: `admin123`
+   - Um usuário admin é criado automaticamente no primeiro start
+
+### Opção 2: Instalação Manual
+
+#### Pré-requisitos
+- Node.js 20+
+- PostgreSQL 16+
+- npm ou yarn
+
+#### Backend
+
+1. Instale o PostgreSQL:
+```bash
+# Ubuntu/Debian
+sudo apt-get install postgresql postgresql-contrib
+
+# macOS (Homebrew)
+brew install postgresql
+```
+
+2. Configure o banco de dados:
+```bash
+sudo -u postgres psql
+CREATE DATABASE estacionamento;
+\c estacionamento
+\i backend/database/schema.sql
+\q
+```
+
+3. Configure o backend:
+```bash
+cd backend
+npm install
+cp .env.example .env
+# Edite o .env com suas credenciais do PostgreSQL
+```
+
+4. Inicie o backend:
+```bash
+cd backend
+npm run dev  # Modo desenvolvimento (porta 3000)
+```
+
+#### Frontend
+
+1. Instale as dependências:
 ```bash
 npm install
 ```
 
-## Como Usar
-
-1. Inicie o servidor de desenvolvimento:
+2. Inicie o servidor de desenvolvimento:
 ```bash
 ng serve
 ```
 
-2. Acesse http://localhost:4200
+3. Acesse http://localhost:4200
 
-3. **Login**:
-   - Digite qualquer usuário e uma senha com no mínimo 6 caracteres
+## Como Usar
+
+### Primeiro Acesso
+
+1. **Registrar Usuário**:
+   - Se estiver usando Docker, use: usuário `admin` e senha `admin123`
+   - Senão, registre um novo usuário via API:
+   ```bash
+   curl -X POST http://localhost:3001/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"username":"admin","password":"senha123"}'
+   ```
+
+2. **Fazer Login**:
+   - Digite seu usuário e senha (mínimo 6 caracteres)
    - Clique em "Entrar"
 
-4. **Adicionar Veículo**:
+### Operações Diárias
+
+1. **Adicionar Veículo**:
    - Clique no botão "Adicionar Veículo"
    - Preencha: Marca, Modelo e Placa (formato: ABC-1234 ou ABC1D23)
    - Clique em "Adicionar"
 
-5. **Retirar Veículo**:
+2. **Retirar Veículo**:
    - Na lista de veículos, clique no botão "Retirada"
    - Visualize o tempo e valor calculado
    - Clique em "Confirmar Retirada"
@@ -59,6 +157,133 @@ ng serve
 - **Valor mínimo**: R$ 5,00
 - **Validação de placa**: Formato brasileiro (ABC-1234 ou ABC1D23)
 - **Senha mínima**: 6 caracteres
+- **Autenticação**: Token JWT com expiração de 24 horas
+
+## Arquitetura do Sistema
+
+### Estrutura de Diretórios
+```
+estacionamento/
+├── src/                    # Frontend Angular
+│   ├── app/
+│   │   ├── components/    # Componentes da UI
+│   │   ├── services/      # Serviços (Auth, Parking)
+│   │   ├── guards/        # Guards de rota
+│   │   └── models/        # Interfaces TypeScript
+│   └── environments/      # Configurações de ambiente
+├── backend/
+│   ├── src/
+│   │   ├── config/        # Configuração do banco
+│   │   ├── controllers/   # Controllers da API
+│   │   ├── middleware/    # Middlewares (Auth, Validation)
+│   │   ├── models/        # Models do banco
+│   │   ├── routes/        # Rotas da API
+│   │   └── server.js      # Servidor Express
+│   └── database/
+│       ├── schema.sql     # Schema do PostgreSQL
+│       └── docker-init.sql # Script de inicialização Docker
+├── docker-compose.yml     # Orquestração dos containers
+├── Dockerfile            # Build do container da aplicação
+└── nginx.conf            # Configuração do Nginx
+```
+
+### API Endpoints
+
+#### Autenticação
+- `POST /api/auth/register` - Registrar novo usuário
+- `POST /api/auth/login` - Fazer login (retorna JWT token)
+- `GET /api/auth/user` - Obter dados do usuário autenticado
+- `POST /api/auth/logout` - Fazer logout
+
+#### Veículos (requer autenticação)
+- `GET /api/vehicles` - Listar todos os veículos
+- `GET /api/vehicles/estacionados` - Listar veículos estacionados
+- `GET /api/vehicles/:id` - Obter veículo por ID
+- `POST /api/vehicles` - Adicionar novo veículo
+- `PUT /api/vehicles/:id/checkout` - Processar retirada
+- `GET /api/vehicles/:id/calcular-valor` - Calcular valor sem retirar
+
+### Database Schema
+
+#### Tabela: users
+```sql
+id UUID PRIMARY KEY
+username VARCHAR(100) UNIQUE NOT NULL
+password_hash VARCHAR(255) NOT NULL
+created_at TIMESTAMP WITH TIME ZONE
+updated_at TIMESTAMP WITH TIME ZONE
+```
+
+#### Tabela: vehicles
+```sql
+id UUID PRIMARY KEY
+marca VARCHAR(100) NOT NULL
+modelo VARCHAR(100) NOT NULL
+placa VARCHAR(20) NOT NULL
+data_entrada TIMESTAMP WITH TIME ZONE NOT NULL
+data_saida TIMESTAMP WITH TIME ZONE
+valor_total NUMERIC(10, 2)
+status vehicle_status NOT NULL ('estacionado' | 'retirado')
+user_id UUID REFERENCES users(id)
+created_at TIMESTAMP WITH TIME ZONE
+updated_at TIMESTAMP WITH TIME ZONE
+```
+
+## Docker
+
+### Containers
+
+O projeto utiliza 2 containers:
+
+1. **database** (PostgreSQL 16):
+   - Porta: 5430 (host) → 5432 (container)
+   - Volume persistente para dados
+   - Healthcheck configurado
+
+2. **app** (Frontend + Backend unificado):
+   - Frontend (Nginx): porta 9091 (host) → 80 (container)
+   - Backend (Node.js): porta 3001 (host) → 3000 (container)
+   - Multi-stage build otimizado
+   - Supervisord gerencia ambos os processos
+
+### Comandos Docker
+
+```bash
+# Iniciar containers
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+
+# Parar containers
+docker-compose down
+
+# Reconstruir após mudanças
+docker-compose up -d --build
+
+# Resetar dados (cuidado: apaga o banco)
+docker-compose down -v
+docker-compose up -d
+```
+
+### Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto para customizar (opcional):
+
+```env
+# Database
+DB_NAME=estacionamento
+DB_USER=postgres
+DB_PASSWORD=postgres123
+DB_PORT=5430
+
+# Application
+APP_PORT=9091
+BACKEND_PORT=3001
+JWT_SECRET=seu-segredo-aqui
+JWT_EXPIRES_IN=24h
+FRONTEND_URL=http://localhost:9091
+```
 
 ## Development server
 
@@ -115,3 +340,75 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Troubleshooting
+
+### Backend não conecta ao banco de dados
+
+1. Verifique se PostgreSQL está rodando:
+```bash
+# Se usando Docker
+docker-compose ps
+
+# Se instalação local
+sudo systemctl status postgresql
+```
+
+2. Verifique as credenciais no arquivo `.env` do backend
+
+3. Teste a conexão manualmente:
+```bash
+psql -U postgres -d estacionamento -h localhost -p 5430
+```
+
+### Frontend não conecta ao backend
+
+1. Verifique se o backend está rodando:
+```bash
+curl http://localhost:3001/health
+```
+
+2. Verifique o CORS no backend (deve aceitar requisições de `http://localhost:4200`)
+
+3. Verifique `src/environments/environment.ts` no frontend
+
+### Erro 401 Unauthorized
+
+1. O token JWT pode ter expirado (faça login novamente)
+2. Verifique se o token está sendo enviado no header Authorization
+3. Verifique se `JWT_SECRET` está configurado no backend
+
+### Docker: Container app não inicia
+
+1. Verifique se a porta 9091 já está em uso:
+```bash
+sudo lsof -i :9091
+```
+
+2. Aguarde o healthcheck do container database completar:
+```bash
+docker-compose logs database
+```
+
+3. Reconstrua os containers:
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+### Erro ao adicionar veículo
+
+1. Verifique se o usuário está autenticado
+2. Valide o formato da placa (ABC-1234 ou ABC1D23)
+3. Verifique os logs do backend:
+```bash
+# Docker
+docker-compose logs app
+
+# Local
+# Verifique o terminal onde rodou npm run dev
+```
+
+## Licença
+
+MIT License
