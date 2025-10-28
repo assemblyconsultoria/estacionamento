@@ -49,3 +49,22 @@ export const verifyToken = (token) => {
     return null;
   }
 };
+
+// Middleware to check if user is admin
+export const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Não autenticado',
+      message: 'Authentication required'
+    });
+  }
+
+  if (!req.user.isAdmin) {
+    return res.status(403).json({
+      error: 'Acesso negado',
+      message: 'Admin privileges required'
+    });
+  }
+
+  next();
+};

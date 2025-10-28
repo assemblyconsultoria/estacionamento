@@ -20,7 +20,8 @@
       "Bash(bash:*)",
       "Bash(cat:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

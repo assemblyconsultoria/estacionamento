@@ -6,19 +6,22 @@ import { Vehicle } from '../../models/vehicle.model';
 import { AddVehicleModal } from '../add-vehicle-modal/add-vehicle-modal';
 import { CheckoutModal } from '../checkout-modal/checkout-modal';
 import { ExportModal } from '../export-modal/export-modal';
+import { AdminModal } from '../admin-modal/admin-modal';
 
 @Component({
   selector: 'app-parking',
-  imports: [CommonModule, AddVehicleModal, CheckoutModal, ExportModal],
+  imports: [CommonModule, AddVehicleModal, CheckoutModal, ExportModal, AdminModal],
   templateUrl: './parking.html',
   styleUrl: './parking.scss',
 })
 export class Parking implements OnInit {
   vehicles: Vehicle[] = [];
   usuario: string | null = '';
+  isAdmin = false;
   showAddModal = false;
   showCheckoutModal = false;
   showExportModal = false;
+  showAdminModal = false;
   selectedVehicle: Vehicle | null = null;
 
   constructor(
@@ -28,6 +31,7 @@ export class Parking implements OnInit {
 
   ngOnInit(): void {
     this.usuario = this.authService.getUsuario();
+    this.isAdmin = this.authService.isAdmin();
     this.loadVehicles();
 
     // Inscreve-se para atualizações automáticas
@@ -82,6 +86,14 @@ export class Parking implements OnInit {
 
   closeExportModal(): void {
     this.showExportModal = false;
+  }
+
+  openAdminModal(): void {
+    this.showAdminModal = true;
+  }
+
+  closeAdminModal(): void {
+    this.showAdminModal = false;
   }
 
   logout(): void {

@@ -4,6 +4,9 @@
       <h1>Sistema de Estacionamento</h1>
       <div class="user-info">
         <span>Bem-vindo, {{ usuario }}</span>
+        @if (isAdmin) {
+          <button class="btn-admin" (click)="openAdminModal()">Admin</button>
+        }
         <button class="btn-logout" (click)="logout()">Sair</button>
       </div>
     </div>
@@ -87,4 +90,10 @@
   <app-export-modal
     (close)="closeExportModal()">
   </app-export-modal>
+}
+
+@if (showAdminModal) {
+  <app-admin-modal
+    (close)="closeAdminModal()">
+  </app-admin-modal>
 }

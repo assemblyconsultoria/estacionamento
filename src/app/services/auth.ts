@@ -12,6 +12,7 @@ interface LoginResponse {
   user: {
     id: string;
     username: string;
+    isAdmin?: boolean;
   };
   token: string;
 }
@@ -21,8 +22,26 @@ interface UserResponse {
   user: {
     id: string;
     username: string;
+    isAdmin?: boolean;
     created_at: string;
   };
+}
+
+interface CheckUsersResponse {
+  success: boolean;
+  usersExist: boolean;
+  count: number;
+}
+
+interface UsersListResponse {
+  success: boolean;
+  users: Array<{
+    id: string;
+    username: string;
+    is_admin: boolean;
+    created_at: string;
+    updated_at: string;
+  }>;
 }
 
 @Injectable({
@@ -49,6 +68,7 @@ export class Auth {
           localStorage.setItem('authToken', response.token);
           localStorage.setItem('usuario', response.user.username);
           localStorage.setItem('userId', response.user.id);
+          localStorage.setItem('isAdmin', String(response.user.isAdmin || false));
           this.isAuthenticatedSubject.next(true);
           return true;
         }
@@ -77,6 +97,7 @@ export class Auth {
     localStorage.removeItem('authToken');
     localStorage.removeItem('usuario');
     localStorage.removeItem('userId');
+    localStorage.removeItem('isAdmin');
     this.isAuthenticatedSubject.next(false);
     this.router.navigate(['/login']);
   }
@@ -124,11 +145,81 @@ export class Auth {
           localStorage.setItem('authToken', response.token);
           localStorage.setItem('usuario', response.user.username);
           localStorage.setItem('userId', response.user.id);
+          localStorage.setItem('isAdmin', String(response.user.isAdmin || false));
           this.isAuthenticatedSubject.next(true);
           return true;
         }
         return false;
       }),
+      catchError(this.handleError)
+    );
+  }
+
+  // Check if users exist (for first-time setup)
+  checkUsersExist(): Observable<boolean> {
+    return this.http.get<CheckUsersResponse>(`${this.apiUrl}/auth/check-users`).pipe(
+      map(response => response.usersExist),
+      catchError(() => {
+        return throwError(() => new Error('Erro ao verificar existência de usuários'));
+      })
+    );
+  }
+
+  // Check if current user is admin
+  isAdmin(): boolean {
+    return localStorage.getItem('isAdmin') === 'true';
+  }
+
+  // Get all users (admin only)
+  getAllUsers(): Observable<UsersListResponse> {
+    const token = this.getToken();
+    return this.http.get<UsersListResponse>(`${this.apiUrl}/auth/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Update user (admin only)
+  updateUser(id: string, username: string): Observable<any> {
+    const token = this.getToken();
+    return this.http.put(`${this.apiUrl}/auth/users/${id}`,
+      { username },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Delete user (admin only)
+  deleteUser(id: string): Observable<any> {
+    const token = this.getToken();
+    return this.http.delete(`${this.apiUrl}/auth/users/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Reset user password (admin only)
+  resetUserPassword(id: string, newPassword: string): Observable<any> {
+    const token = this.getToken();
+    return this.http.post(`${this.apiUrl}/auth/users/${id}/reset-password`,
+      { newPassword },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    ).pipe(
       catchError(this.handleError)
     );
   }

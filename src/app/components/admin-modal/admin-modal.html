@@ -1,0 +1,111 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Administração de Usuários</h2>
+      <button class="close-btn" (click)="onClose()">&times;</button>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="success-message">
+        {{ successMessage }}
+      </div>
+    }
+
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+      </div>
+    } @else {
+      @if (users.length === 0) {
+        <div class="empty-state">
+          <p>Nenhum usuário encontrado</p>
+        </div>
+      } @else {
+        <div class="users-list">
+          @for (user of users; track user.id) {
+            <div class="user-card">
+              <div class="user-header">
+                @if (editingUserId === user.id) {
+                  <div class="edit-form">
+                    <input
+                      type="text"
+                      [(ngModel)]="editUsername"
+                      placeholder="Nome de usuário"
+                      class="edit-input"
+                    />
+                    <div class="edit-actions">
+                      <button class="btn-save" (click)="saveEdit(user.id)">Salvar</button>
+                      <button class="btn-cancel-small" (click)="cancelEdit()">Cancelar</button>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="user-info">
+                    <h3>{{ user.username }}</h3>
+                    @if (user.is_admin) {
+                      <span class="admin-badge">Admin</span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="user-details">
+                <p class="detail-item">
+                  <span class="label">Criado em:</span>
+                  <span class="value">{{ user.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                </p>
+              </div>
+
+              @if (resettingUserId === user.id) {
+                <div class="reset-password-form">
+                  <div class="form-group">
+                    <label>Nova Senha</label>
+                    <input
+                      type="password"
+                      [(ngModel)]="newPassword"
+                      placeholder="Digite a nova senha (mínimo 6 caracteres)"
+                      minlength="6"
+                      autocomplete="new-password"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label>Confirmar Senha</label>
+                    <input
+                      type="password"
+                      [(ngModel)]="newPasswordConfirm"
+                      placeholder="Digite a senha novamente"
+                      minlength="6"
+                      autocomplete="new-password"
+                    />
+                  </div>
+                  <div class="form-actions">
+                    <button class="btn-save" (click)="resetPassword(user.id)">Confirmar</button>
+                    <button class="btn-cancel-small" (click)="cancelResetPassword()">Cancelar</button>
+                  </div>
+                </div>
+              } @else {
+                <div class="user-actions">
+                  @if (editingUserId !== user.id) {
+                    <button class="btn-edit" (click)="startEdit(user)">Editar</button>
+                    <button class="btn-reset" (click)="startResetPassword(user)">Reset Senha</button>
+                    <button class="btn-delete" (click)="deleteUser(user)">Excluir</button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+
+    <div class="modal-footer">
+      <button class="btn-close" (click)="onClose()">Fechar</button>
+    </div>
+  </div>
+</div>

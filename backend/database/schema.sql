@@ -23,6 +23,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
+    is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -48,6 +49,7 @@ CREATE INDEX idx_vehicles_status ON vehicles(status);
 CREATE INDEX idx_vehicles_data_entrada ON vehicles(data_entrada);
 CREATE INDEX idx_vehicles_user_id ON vehicles(user_id);
 CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_is_admin ON users(is_admin);
 
 -- Create unique index for active vehicles (one placa per active vehicle)
 CREATE UNIQUE INDEX idx_vehicles_active_placa ON vehicles(placa)
