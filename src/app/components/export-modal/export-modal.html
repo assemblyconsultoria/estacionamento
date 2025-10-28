@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="fecharModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Exportar Relatório</h2>
+      <button class="close-button" (click)="fecharModal()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="periodo-section">
+        <label>Selecione o período:</label>
+        <div class="periodo-options">
+          <label class="periodo-option">
+            <input
+              type="radio"
+              name="periodo"
+              value="dia"
+              [(ngModel)]="periodoSelecionado"
+            />
+            <span>Hoje</span>
+          </label>
+
+          <label class="periodo-option">
+            <input
+              type="radio"
+              name="periodo"
+              value="semana"
+              [(ngModel)]="periodoSelecionado"
+            />
+            <span>Última semana</span>
+          </label>
+
+          <label class="periodo-option">
+            <input
+              type="radio"
+              name="periodo"
+              value="mes"
+              [(ngModel)]="periodoSelecionado"
+            />
+            <span>Último mês</span>
+          </label>
+
+          <label class="periodo-option">
+            <input
+              type="radio"
+              name="periodo"
+              value="customizado"
+              [(ngModel)]="periodoSelecionado"
+            />
+            <span>Período customizado</span>
+          </label>
+        </div>
+      </div>
+
+      @if (periodoSelecionado === 'customizado') {
+        <div class="custom-period-section">
+          <label for="diasCustomizado">Número de dias:</label>
+          <input
+            type="number"
+            id="diasCustomizado"
+            [(ngModel)]="diasCustomizado"
+            min="1"
+            max="365"
+            placeholder="Ex: 15"
+            class="custom-input"
+          />
+          <p class="helper-text">Digite quantos dias para trás deseja exportar (máx: 365 dias)</p>
+        </div>
+      }
+
+      <div class="info-section">
+        <p class="info-text">
+          O relatório incluirá todos os veículos e o valor total das entradas no período selecionado.
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancelar" (click)="fecharModal()">Cancelar</button>
+      <button
+        class="btn-exportar"
+        (click)="exportarExcel()"
+        [disabled]="exportando"
+      >
+        @if (exportando) {
+          <span>Exportando...</span>
+        } @else {
+          <span>Exportar Excel</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

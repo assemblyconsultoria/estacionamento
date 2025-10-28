@@ -11,9 +11,14 @@
 
   <main class="parking-main">
     <div class="actions-bar">
-      <button class="btn-add" (click)="openAddModal()">
-        + Adicionar Veículo
-      </button>
+      <div class="left-actions">
+        <button class="btn-add" (click)="openAddModal()">
+          + Adicionar Veículo
+        </button>
+        <button class="btn-export" (click)="openExportModal()">
+          📊 Exportar Relatório
+        </button>
+      </div>
       <div class="total-vehicles">
         Total de veículos: {{ vehicles.length }}
       </div>
@@ -76,4 +81,10 @@
     (close)="closeCheckoutModal()"
     (checkout)="onVehicleCheckedOut()">
   </app-checkout-modal>
+}
+
+@if (showExportModal) {
+  <app-export-modal
+    (close)="closeExportModal()">
+  </app-export-modal>
 }

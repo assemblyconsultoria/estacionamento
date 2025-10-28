@@ -18,7 +18,9 @@
       "Bash(python3:*)",
       "Bash(./verify-port-config.sh:*)",
       "Bash(bash:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(docker compose:*)"
     ],
     "deny": [],
     "ask": []

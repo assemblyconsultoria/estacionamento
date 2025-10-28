@@ -1,36 +1,93 @@
-# Multi-stage build for Angular 20 application
-# Stage 1: Build the Angular application
-FROM node:20-alpine AS build
+# Multi-stage build for Full Stack Application (Frontend + Backend)
+# This Dockerfile builds both Angular frontend and Node.js backend in a single container
+
+# ============================================
+# Stage 1: Build Backend Dependencies
+# ============================================
+FROM node:20-alpine AS backend-deps
+
+WORKDIR /backend
+
+# Copy backend package files
+COPY backend/package*.json ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# ============================================
+# Stage 2: Build Angular Frontend
+# ============================================
+FROM node:20-alpine AS frontend-build
 
 WORKDIR /app
 
-# Copy package files
+# Copy frontend package files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm ci --legacy-peer-deps
 
-# Copy source code
+# Copy frontend source code
 COPY . .
 
-# Build the application for production
+# Build the Angular application for production
 RUN npm run build -- --configuration production
 
-# Stage 2: Serve with nginx
-FROM nginx:alpine
+# ============================================
+# Stage 3: Final Image - Node.js + Nginx + Supervisord
+# ============================================
+FROM node:20-alpine
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Install nginx and supervisord
+RUN apk add --no-cache nginx supervisor wget
 
-# Copy built application from build stage
-COPY --from=build /app/dist/parking-app/browser /usr/share/nginx/html
+# Create necessary directories
+RUN mkdir -p /var/log/supervisor \
+    /run/nginx \
+    /backend \
+    /frontend
 
-# Expose port 80
-EXPOSE 80
+# ============================================
+# Setup Backend
+# ============================================
+WORKDIR /backend
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+# Copy backend dependencies from stage 1
+COPY --from=backend-deps /backend/node_modules ./node_modules
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Copy backend source code
+COPY backend/package*.json ./
+COPY backend/src ./src
+
+# ============================================
+# Setup Frontend (Nginx)
+# ============================================
+
+# Copy built frontend from stage 2
+COPY --from=frontend-build /app/dist/parking-app/browser /frontend
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/http.d/default.conf
+
+# ============================================
+# Setup Supervisord
+# ============================================
+
+# Copy supervisord configuration
+COPY supervisord.conf /etc/supervisord.conf
+
+# Create non-root user for better security
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001 && \
+    chown -R appuser:appuser /backend /frontend /var/log/supervisor /var/lib/nginx /var/log/nginx
+
+# Expose ports
+EXPOSE 80 3000
+
+# Health check - check both frontend and backend
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost/ && \
+      wget --quiet --tries=1 --spider http://localhost:3000/health || exit 1
+
+# Start supervisord (manages both nginx and node)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

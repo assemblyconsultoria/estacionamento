@@ -5,10 +5,11 @@ import { Parking as ParkingService } from '../../services/parking';
 import { Vehicle } from '../../models/vehicle.model';
 import { AddVehicleModal } from '../add-vehicle-modal/add-vehicle-modal';
 import { CheckoutModal } from '../checkout-modal/checkout-modal';
+import { ExportModal } from '../export-modal/export-modal';
 
 @Component({
   selector: 'app-parking',
-  imports: [CommonModule, AddVehicleModal, CheckoutModal],
+  imports: [CommonModule, AddVehicleModal, CheckoutModal, ExportModal],
   templateUrl: './parking.html',
   styleUrl: './parking.scss',
 })
@@ -17,6 +18,7 @@ export class Parking implements OnInit {
   usuario: string | null = '';
   showAddModal = false;
   showCheckoutModal = false;
+  showExportModal = false;
   selectedVehicle: Vehicle | null = null;
 
   constructor(
@@ -72,6 +74,14 @@ export class Parking implements OnInit {
   onVehicleCheckedOut(): void {
     this.closeCheckoutModal();
     this.loadVehicles();
+  }
+
+  openExportModal(): void {
+    this.showExportModal = true;
+  }
+
+  closeExportModal(): void {
+    this.showExportModal = false;
   }
 
   logout(): void {
