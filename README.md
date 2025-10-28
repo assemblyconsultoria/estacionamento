@@ -337,6 +337,63 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## CI/CD com Jenkins
+
+O projeto inclui uma pipeline CI/CD completa configurada para Jenkins.
+
+### Funcionalidades da Pipeline
+
+- Build automático do frontend e backend
+- Testes unitários e de integração
+- Análise de código (lint)
+- Build de imagens Docker
+- Deploy automático com Docker Compose
+- Health checks e smoke tests
+- Limpeza automática de builds antigos
+
+### Quick Start
+
+1. **Configure credenciais no Jenkins**:
+   - Acesse: http://localhost:9090
+   - Crie credenciais secretas:
+     - `estacionamento-db-password`: Senha do PostgreSQL
+     - `estacionamento-jwt-secret`: Secret para JWT
+
+2. **Crie o job da pipeline**:
+   - New Item > Pipeline
+   - Nome: `estacionamento-pipeline`
+   - Definition: Pipeline script from SCM
+   - Repository: `https://github.com/assemblyconsultoria/estacionamento.git`
+   - Script Path: `Jenkinsfile`
+
+3. **Execute o build**:
+   - Clique em "Build Now"
+   - Acompanhe em "Console Output"
+
+### Documentação Completa
+
+Para instruções detalhadas de configuração e troubleshooting, consulte:
+- [JENKINS.md](JENKINS.md) - Guia completo de CI/CD
+
+### Estrutura da Pipeline
+
+```
+Checkout → Environment Info → Install Dependencies (paralelo)
+    ↓
+Lint & Code Quality (paralelo) → Run Tests (paralelo)
+    ↓
+Build Frontend → Build Docker Images
+    ↓
+Stop Previous Deployment → Deploy → Health Check → Smoke Tests
+```
+
+### Acesso Pós-Deploy
+
+Após build bem-sucedido:
+- Frontend: http://localhost:9091
+- Backend: http://localhost:3001
+- Database: localhost:5430
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

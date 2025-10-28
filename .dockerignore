@@ -41,6 +41,9 @@ coverage
 # CI/CD
 .github
 .gitlab-ci.yml
+Jenkinsfile
+JENKINS.md
+.jenkins
 
 # Docker
 Dockerfile
