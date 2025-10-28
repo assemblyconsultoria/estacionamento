@@ -1,27 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node --version:*)",
-      "Bash(npm --version)",
-      "Bash(ng version:*)",
-      "Bash(ng new:*)",
-      "Bash(ng generate:*)",
-      "Bash(ng build:*)",
-      "Bash(mkdir:*)",
-      "Bash(npm init:*)",
-      "Bash(npm install:*)",
-      "Bash(psql:*)",
-      "Bash(chmod:*)",
-      "Bash(test:*)",
-      "Bash(PGPASSWORD=postgres123 psql:*)",
-      "Bash(docker-compose config:*)",
-      "Bash(python3:*)",
-      "Bash(./verify-port-config.sh:*)",
-      "Bash(bash:*)",
-      "Bash(cat:*)",
-      "mcp__ide__getDiagnostics",
-      "Bash(docker compose:*)",
-      "Bash(git add:*)"
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
