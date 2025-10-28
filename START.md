@@ -61,7 +61,7 @@ Open browser: http://localhost:4200
 
 Use credentials:
 - Username: `admin`
-- Password: `senha123`
+- Password: `admin123`
 
 ## Running the Application
 
