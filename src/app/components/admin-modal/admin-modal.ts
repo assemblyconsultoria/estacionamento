@@ -25,6 +25,12 @@ export class AdminModal implements OnInit {
   errorMessage = '';
   successMessage = '';
 
+  // Add new user
+  showAddUserForm = false;
+  newUsername = '';
+  newUserPassword = '';
+  newUserPasswordConfirm = '';
+
   // Edit user
   editingUserId: string | null = null;
   editUsername = '';
@@ -56,10 +62,60 @@ export class AdminModal implements OnInit {
     });
   }
 
+  openAddUserForm(): void {
+    this.showAddUserForm = true;
+    this.newUsername = '';
+    this.newUserPassword = '';
+    this.newUserPasswordConfirm = '';
+    this.cancelEdit();
+    this.cancelResetPassword();
+    this.clearMessages();
+  }
+
+  closeAddUserForm(): void {
+    this.showAddUserForm = false;
+    this.newUsername = '';
+    this.newUserPassword = '';
+    this.newUserPasswordConfirm = '';
+  }
+
+  addUser(): void {
+    if (!this.newUsername || !this.newUserPassword || !this.newUserPasswordConfirm) {
+      this.errorMessage = 'Por favor, preencha todos os campos';
+      return;
+    }
+
+    if (this.newUserPassword.length < 6) {
+      this.errorMessage = 'A senha deve ter no mínimo 6 caracteres';
+      return;
+    }
+
+    if (this.newUserPassword !== this.newUserPasswordConfirm) {
+      this.errorMessage = 'As senhas não coincidem';
+      return;
+    }
+
+    this.loading = true;
+    this.clearMessages();
+
+    this.authService.register(this.newUsername, this.newUserPassword).subscribe({
+      next: () => {
+        this.successMessage = 'Usuário criado com sucesso';
+        this.closeAddUserForm();
+        this.loadUsers();
+      },
+      error: (error) => {
+        this.errorMessage = error.message || 'Erro ao criar usuário';
+        this.loading = false;
+      }
+    });
+  }
+
   startEdit(user: UserData): void {
     this.editingUserId = user.id;
     this.editUsername = user.username;
     this.cancelResetPassword();
+    this.closeAddUserForm();
     this.clearMessages();
   }
 
@@ -95,6 +151,7 @@ export class AdminModal implements OnInit {
     this.newPassword = '';
     this.newPasswordConfirm = '';
     this.cancelEdit();
+    this.closeAddUserForm();
     this.clearMessages();
   }
 

@@ -17,6 +17,58 @@
       </div>
     }
 
+    <!-- Botão Adicionar Usuário -->
+    @if (!showAddUserForm && !loading) {
+      <div class="add-user-button-container">
+        <button class="btn-add-user" (click)="openAddUserForm()">
+          + Adicionar Usuário
+        </button>
+      </div>
+    }
+
+    <!-- Formulário Adicionar Usuário -->
+    @if (showAddUserForm) {
+      <div class="add-user-form">
+        <h3>Novo Usuário</h3>
+        <div class="form-group">
+          <label for="newUsername">Nome de Usuário</label>
+          <input
+            type="text"
+            id="newUsername"
+            [(ngModel)]="newUsername"
+            placeholder="Digite o nome de usuário"
+            autocomplete="username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="newUserPassword">Senha</label>
+          <input
+            type="password"
+            id="newUserPassword"
+            [(ngModel)]="newUserPassword"
+            placeholder="Digite a senha (mínimo 6 caracteres)"
+            minlength="6"
+            autocomplete="new-password"
+          />
+        </div>
+        <div class="form-group">
+          <label for="newUserPasswordConfirm">Confirmar Senha</label>
+          <input
+            type="password"
+            id="newUserPasswordConfirm"
+            [(ngModel)]="newUserPasswordConfirm"
+            placeholder="Digite a senha novamente"
+            minlength="6"
+            autocomplete="new-password"
+          />
+        </div>
+        <div class="form-actions">
+          <button class="btn-save" (click)="addUser()">Criar Usuário</button>
+          <button class="btn-cancel-small" (click)="closeAddUserForm()">Cancelar</button>
+        </div>
+      </div>
+    }
+
     @if (loading) {
       <div class="loading-state">
         <div class="spinner"></div>
