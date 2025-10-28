@@ -1,6 +1,37 @@
 # Quick Start Guide
 
-## Prerequisites Check
+## 🐳 Opção 1: Início Rápido com Docker (RECOMENDADO)
+
+### Pré-requisitos
+- Docker e Docker Compose instalados
+
+### Iniciar o Sistema
+```bash
+# 1. Clone o repositório
+git clone <url-do-repositorio>
+cd estacionamento
+
+# 2. Inicie os containers
+docker-compose up -d
+
+# 3. Aguarde ~30 segundos e acesse
+# Frontend: http://localhost
+# Backend: http://localhost:3000
+```
+
+### Fazer Login
+- **Usuário**: `admin`
+- **Senha**: `admin123`
+
+O usuário admin é criado **automaticamente** na primeira inicialização!
+
+📖 **Documentação completa**: Ver [README-DOCKER.md](README-DOCKER.md)
+
+---
+
+## 💻 Opção 2: Desenvolvimento Manual
+
+### Prerequisites Check
 
 Before starting, ensure you have:
 - [ ] Node.js installed (v18+): `node --version`

@@ -26,10 +26,13 @@ Se você está instalando pela primeira vez, o Docker já configurará tudo auto
 
 ## 👤 Credenciais de Acesso
 
-### Usuário Administrador Padrão
+### Usuário Administrador Padrão (Docker)
+Quando você inicia o sistema com Docker, o usuário admin é criado automaticamente:
 - **Usuário**: `admin`
 - **Senha**: `admin123`
 - **Tipo**: Administrador (is_admin = true)
+
+**IMPORTANTE**: Este usuário é criado automaticamente pelo script `docker-init.sql` na primeira inicialização do container do banco de dados.
 
 ## 🚀 Como Usar
 

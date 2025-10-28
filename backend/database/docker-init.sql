@@ -72,10 +72,26 @@ CREATE TRIGGER update_vehicles_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Insert default admin user
+-- Username: admin
+-- Password: admin123
+-- Password hash generated with bcrypt (10 rounds)
+INSERT INTO users (username, password_hash, is_admin)
+VALUES ('admin', '$2b$10$4GRKoULDiCsnNjAIRslr8eyKC//7yTATuliECJ73NxuJBWx6osuWS', true)
+ON CONFLICT (username) DO NOTHING;
+
 -- Success message (visible in docker logs)
 DO $$
 BEGIN
+    RAISE NOTICE '========================================';
     RAISE NOTICE 'Database initialization completed successfully!';
+    RAISE NOTICE '========================================';
     RAISE NOTICE 'Tables created: users, vehicles';
+    RAISE NOTICE 'Default admin user created:';
+    RAISE NOTICE '  Username: admin';
+    RAISE NOTICE '  Password: admin123';
+    RAISE NOTICE '  Admin: YES';
+    RAISE NOTICE '========================================';
     RAISE NOTICE 'Ready to accept connections from backend service';
+    RAISE NOTICE '========================================';
 END $$;
