@@ -13,9 +13,28 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+// Configure CORS to accept multiple origins
+const allowedOrigins = [
+  'http://localhost:4200',       // Development Angular server
+  'http://localhost:9091',       // Docker production
+  'http://localhost',            // Alternative Docker access
+  process.env.FRONTEND_URL       // Custom URL from env
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

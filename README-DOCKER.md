@@ -33,9 +33,11 @@ Este comando irá:
 Aguarde cerca de 30-40 segundos para os containers iniciarem completamente, então:
 
 ```
-Frontend: http://localhost
-Backend API: http://localhost:3000
+Frontend: http://localhost:9091
+Backend API: http://localhost:3001 (exposta para debug/desenvolvimento)
 ```
+
+**NOTA**: A API também está acessível através do frontend em `http://localhost:9091/api/` (proxy via nginx)
 
 ### 4. Faça Login
 
@@ -47,14 +49,18 @@ Use as credenciais padrão criadas automaticamente:
 
 ```
 ┌─────────────────────────────────────┐
-│  estacionamento-app (Porta 80/3000) │
+│  estacionamento-app                 │
+│  (Porta Externa: 9091/3001)         │
 │  ┌───────────────────────────────┐  │
 │  │  Frontend (Angular 20)        │  │
-│  │  - Nginx na porta 80          │  │
+│  │  - Nginx na porta 80 interna  │  │
+│  │  - Acesso: localhost:9091     │  │
 │  └───────────────────────────────┘  │
 │  ┌───────────────────────────────┐  │
 │  │  Backend (Node.js/Express)    │  │
-│  │  - API na porta 3000          │  │
+│  │  - API na porta 3000 interna  │  │
+│  │  - Acesso: localhost:3001     │  │
+│  │  - Proxy: localhost:9091/api/ │  │
 │  └───────────────────────────────┘  │
 └─────────────────────────────────────┘
                   │
@@ -142,7 +148,11 @@ estacionamento-db     Up (healthy)
 
 ### 2. Testar Backend
 ```bash
-curl http://localhost:3000/health
+# Via porta direta do backend
+curl http://localhost:3001/health
+
+# OU via proxy do nginx
+curl http://localhost:9091/api/../health
 ```
 
 Resposta esperada:
@@ -152,7 +162,7 @@ Resposta esperada:
 
 ### 3. Testar Usuário Admin
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 ```
@@ -189,9 +199,9 @@ JWT_SECRET=seu-segredo-aqui
 JWT_EXPIRES_IN=24h
 
 # Frontend
-FRONTEND_URL=http://localhost
-APP_PORT=80
-BACKEND_PORT=3000
+FRONTEND_URL=http://localhost:9091
+APP_PORT=9091
+BACKEND_PORT=3001
 ```
 
 ## 🗄️ Persistência de Dados
@@ -238,12 +248,19 @@ docker-compose down -v
 docker-compose up -d
 ```
 
-### Problema: Porta 80 ou 3000 já está em uso
+### Problema: Porta 9091 ou 3001 já está em uso
 Edite o arquivo `docker-compose.yml` e altere as portas:
 ```yaml
 ports:
-  - "8080:80"      # Usar porta 8080 ao invés de 80
-  - "3001:3000"    # Usar porta 3001 ao invés de 3000
+  - "8080:80"      # Usar porta 8080 ao invés de 9091
+  - "3002:3000"    # Usar porta 3002 ao invés de 3001
+```
+
+Ou crie um arquivo `.env` na raiz do projeto:
+```bash
+APP_PORT=8080
+BACKEND_PORT=3002
+FRONTEND_URL=http://localhost:8080
 ```
 
 ### Problema: Usuário admin não foi criado
@@ -307,7 +324,7 @@ estacionamento/
 
 Após iniciar o sistema:
 
-1. ✅ Acesse http://localhost
+1. ✅ Acesse http://localhost:9091
 2. ✅ Faça login com admin/admin123
 3. ✅ Altere a senha do admin (via painel admin)
 4. ✅ Crie outros usuários conforme necessário

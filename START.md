@@ -15,8 +15,8 @@ cd estacionamento
 docker-compose up -d
 
 # 3. Aguarde ~30 segundos e acesse
-# Frontend: http://localhost
-# Backend: http://localhost:3000
+# Frontend: http://localhost:9091
+# Backend API: http://localhost:3001
 ```
 
 ### Fazer Login
