@@ -6,7 +6,14 @@
       "Bash(node -e:*)",
       "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzODIzNTEwLWVkM2EtNDBlOS1iYzEyLWI3ODYwYTRlZTI0MyIsInVzZXJuYW1lIjoiYWRtaW4iLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3NjE2NTE0NDksImV4cCI6MTc2MTczNzg0OX0.CCjE4fLvXcuGksxOSGYIi8OKMt8awHUZzsLHu13ByIQ\" curl -s 'http://localhost:3000/api/auth/users' -H \"Authorization: Bearer $TOKEN\")",
       "Bash(git commit:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(systemctl status:*)",
+      "Bash(service postgresql status:*)",
+      "Bash(psql:*)",
+      "Bash(PGPASSWORD=postgres123 psql:*)",
+      "Bash(ng serve)"
     ],
     "deny": [],
     "ask": []
