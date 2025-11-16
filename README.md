@@ -5,6 +5,7 @@ Sistema completo de gerenciamento de estacionamento desenvolvido com Angular 20 
 ## Funcionalidades
 
 - **Autenticação de Usuários**: Sistema de login seguro com JWT e validação
+- **Registro de Usuários**: Interface intuitiva para criação de novas contas
 - **Gestão de Veículos**: Registro de entrada com marca, modelo e placa
 - **Controle de Tempo**: Monitoramento automático do tempo de permanência
 - **Cálculo Automático**: Geração de valores baseado em R$ 5,00/hora
@@ -127,8 +128,21 @@ ng serve
 ### Primeiro Acesso
 
 1. **Registrar Usuário**:
+
+   **Opção 1: Via Interface (Recomendado)**
+   - Acesse a página de login
+   - Clique no link "Não tem uma conta? Registre-se"
+   - Preencha o formulário com:
+     - Nome de usuário
+     - Senha (mínimo 6 caracteres)
+     - Confirmação de senha
+   - Clique em "Criar Conta"
+
+   **Opção 2: Docker (usuário pré-criado)**
    - Se estiver usando Docker, use: usuário `admin` e senha `admin123`
-   - Senão, registre um novo usuário via API:
+
+   **Opção 3: Via API**
+   - Registre um novo usuário via API:
    ```bash
    curl -X POST http://localhost:3001/api/auth/register \
      -H "Content-Type: application/json" \
@@ -138,6 +152,14 @@ ng serve
 2. **Fazer Login**:
    - Digite seu usuário e senha (mínimo 6 caracteres)
    - Clique em "Entrar"
+
+### Navegação entre Login e Registro
+
+A tela de login permite alternar facilmente entre os modos:
+- **Login**: "Já tem uma conta? Faça login"
+- **Registro**: "Não tem uma conta? Registre-se"
+
+Basta clicar no link correspondente para alternar entre os formulários.
 
 ### Operações Diárias
 

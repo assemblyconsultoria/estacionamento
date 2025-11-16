@@ -13,12 +13,14 @@ import { Auth } from '../../services/auth';
 export class Login {
   usuario = '';
   senha = '';
+  senhaConfirm = '';
   errorMessage = '';
   usersExist = true;
   showFirstAccessModal = false;
   firstAccessUsername = '';
   firstAccessPassword = '';
   firstAccessPasswordConfirm = '';
+  isRegisterMode = false;
 
   constructor(
     private authService: Auth,
@@ -105,6 +107,46 @@ export class Login {
       next: (success) => {
         if (success) {
           this.closeFirstAccessModal();
+          this.router.navigate(['/parking']);
+        } else {
+          this.errorMessage = 'Erro ao criar usuário. Tente novamente.';
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.message || 'Erro ao criar usuário. Tente novamente.';
+      }
+    });
+  }
+
+  toggleMode(): void {
+    this.isRegisterMode = !this.isRegisterMode;
+    this.errorMessage = '';
+    this.usuario = '';
+    this.senha = '';
+    this.senhaConfirm = '';
+  }
+
+  onRegisterSubmit(): void {
+    this.errorMessage = '';
+
+    if (!this.usuario || !this.senha || !this.senhaConfirm) {
+      this.errorMessage = 'Por favor, preencha todos os campos.';
+      return;
+    }
+
+    if (this.senha.length < 6) {
+      this.errorMessage = 'A senha deve ter no mínimo 6 caracteres.';
+      return;
+    }
+
+    if (this.senha !== this.senhaConfirm) {
+      this.errorMessage = 'As senhas não coincidem.';
+      return;
+    }
+
+    this.authService.register(this.usuario, this.senha).subscribe({
+      next: (success) => {
+        if (success) {
           this.router.navigate(['/parking']);
         } else {
           this.errorMessage = 'Erro ao criar usuário. Tente novamente.';

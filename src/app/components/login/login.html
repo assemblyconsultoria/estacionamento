@@ -2,53 +2,120 @@
   <div class="login-card">
     <div class="login-header">
       <h1>Sistema de Estacionamento</h1>
-      <p>Faça login para acessar o sistema</p>
+      <p>{{ isRegisterMode ? 'Crie sua conta para acessar o sistema' : 'Faça login para acessar o sistema' }}</p>
     </div>
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-      <div class="form-group">
-        <label for="usuario">Usuário</label>
-        <input
-          type="text"
-          id="usuario"
-          name="usuario"
-          [(ngModel)]="usuario"
-          required
-          placeholder="Digite seu usuário"
-          autocomplete="username"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="senha">Senha</label>
-        <input
-          type="password"
-          id="senha"
-          name="senha"
-          [(ngModel)]="senha"
-          required
-          minlength="6"
-          placeholder="Digite sua senha"
-          autocomplete="current-password"
-        />
-      </div>
-
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
+    <!-- Formulário de Login -->
+    @if (!isRegisterMode) {
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <div class="form-group">
+          <label for="usuario">Usuário</label>
+          <input
+            type="text"
+            id="usuario"
+            name="usuario"
+            [(ngModel)]="usuario"
+            required
+            placeholder="Digite seu usuário"
+            autocomplete="username"
+          />
         </div>
-      }
 
-      <button type="submit" class="btn-login" [disabled]="!loginForm.valid">
-        Entrar
-      </button>
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            [(ngModel)]="senha"
+            required
+            minlength="6"
+            placeholder="Digite sua senha"
+            autocomplete="current-password"
+          />
+        </div>
 
-      @if (!usersExist) {
-        <button type="button" class="btn-first-access" (click)="openFirstAccessModal()">
-          Primeiro Acesso
+        @if (errorMessage) {
+          <div class="error-message">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button type="submit" class="btn-login" [disabled]="!loginForm.valid">
+          Entrar
         </button>
-      }
-    </form>
+
+        @if (!usersExist) {
+          <button type="button" class="btn-first-access" (click)="openFirstAccessModal()">
+            Primeiro Acesso
+          </button>
+        }
+
+        <div class="toggle-mode">
+          <p>Não tem uma conta? <a (click)="toggleMode()">Registre-se</a></p>
+        </div>
+      </form>
+    }
+
+    <!-- Formulário de Registro -->
+    @if (isRegisterMode) {
+      <form (ngSubmit)="onRegisterSubmit()" #registerForm="ngForm">
+        <div class="form-group">
+          <label for="usuario-register">Usuário</label>
+          <input
+            type="text"
+            id="usuario-register"
+            name="usuario"
+            [(ngModel)]="usuario"
+            required
+            placeholder="Digite seu usuário"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="senha-register">Senha</label>
+          <input
+            type="password"
+            id="senha-register"
+            name="senha"
+            [(ngModel)]="senha"
+            required
+            minlength="6"
+            placeholder="Digite sua senha (mínimo 6 caracteres)"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="senha-confirm">Confirmar Senha</label>
+          <input
+            type="password"
+            id="senha-confirm"
+            name="senhaConfirm"
+            [(ngModel)]="senhaConfirm"
+            required
+            minlength="6"
+            placeholder="Digite a senha novamente"
+            autocomplete="new-password"
+          />
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button type="submit" class="btn-register" [disabled]="!registerForm.valid">
+          Criar Conta
+        </button>
+
+        <div class="toggle-mode">
+          <p>Já tem uma conta? <a (click)="toggleMode()">Faça login</a></p>
+        </div>
+      </form>
+    }
 
     <div class="login-footer">
       <p>Sistema desenvolvido com Angular 20</p>
