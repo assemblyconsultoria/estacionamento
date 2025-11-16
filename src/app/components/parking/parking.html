@@ -22,20 +22,34 @@
           📊 Exportar Relatório
         </button>
       </div>
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchTerm"
+          placeholder="🔍 Buscar por modelo ou placa..."
+        />
+      </div>
       <div class="total-vehicles">
-        Total de veículos: {{ vehicles.length }}
+        Total de veículos: {{ filteredVehicles.length }}
       </div>
     </div>
 
-    @if (vehicles.length === 0) {
+    @if (filteredVehicles.length === 0 && vehicles.length === 0) {
       <div class="empty-state">
         <div class="empty-icon">🚗</div>
         <h2>Nenhum veículo estacionado</h2>
         <p>Clique em "Adicionar Veículo" para registrar um novo veículo no estacionamento.</p>
       </div>
+    } @else if (filteredVehicles.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h2>Nenhum veículo encontrado</h2>
+        <p>Não encontramos veículos com os termos "{{ searchTerm }}"</p>
+      </div>
     } @else {
       <div class="vehicles-grid">
-        @for (vehicle of vehicles; track vehicle.id) {
+        @for (vehicle of filteredVehicles; track vehicle.id) {
           <div class="vehicle-card">
             <div class="vehicle-header">
               <div class="vehicle-icon">🚗</div>

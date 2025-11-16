@@ -13,7 +13,8 @@
       "Bash(service postgresql status:*)",
       "Bash(psql:*)",
       "Bash(PGPASSWORD=postgres123 psql:*)",
-      "Bash(ng serve)"
+      "Bash(ng serve)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

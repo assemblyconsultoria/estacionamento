@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import { Parking as ParkingService } from '../../services/parking';
 import { Vehicle } from '../../models/vehicle.model';
@@ -10,7 +11,7 @@ import { AdminModal } from '../admin-modal/admin-modal';
 
 @Component({
   selector: 'app-parking',
-  imports: [CommonModule, AddVehicleModal, CheckoutModal, ExportModal, AdminModal],
+  imports: [CommonModule, FormsModule, AddVehicleModal, CheckoutModal, ExportModal, AdminModal],
   templateUrl: './parking.html',
   styleUrl: './parking.scss',
 })
@@ -23,6 +24,7 @@ export class Parking implements OnInit {
   showExportModal = false;
   showAdminModal = false;
   selectedVehicle: Vehicle | null = null;
+  searchTerm: string = '';
 
   constructor(
     private authService: Auth,
@@ -112,5 +114,17 @@ export class Parking implements OnInit {
       return `${minutos} min`;
     }
     return `${horas}h ${minutos}min`;
+  }
+
+  get filteredVehicles(): Vehicle[] {
+    if (!this.searchTerm.trim()) {
+      return this.vehicles;
+    }
+
+    const term = this.searchTerm.toLowerCase().trim();
+    return this.vehicles.filter(vehicle =>
+      vehicle.modelo.toLowerCase().includes(term) ||
+      vehicle.placa.toLowerCase().includes(term)
+    );
   }
 }
