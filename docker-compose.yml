@@ -15,7 +15,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./backend/database/docker-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     ports:
-      - "${DB_PORT:-5430}:5432"
+      - "${DB_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-estacionamento}"]
       interval: 10s
@@ -46,10 +46,10 @@ services:
       NODE_ENV: production
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:9091}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:80}
     ports:
-      - "${APP_PORT:-9091}:80"
-      - "${BACKEND_PORT:-3001}:3000"
+      - "${APP_PORT:-80}:80"
+      - "${BACKEND_PORT:-3000}:3000"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/ && wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
       interval: 30s
