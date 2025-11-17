@@ -60,8 +60,8 @@ docker-compose up -d
 ```
 
 4. Acesse a aplicação:
-   - Frontend: http://localhost:9091
-   - Backend API: http://localhost:3001/health
+   - Frontend: http://localhost
+   - Backend API: http://localhost:3000/health
 
 5. **Login inicial (Docker)**:
    - Usuário: `admin`
@@ -144,7 +144,7 @@ ng serve
    **Opção 3: Via API**
    - Registre um novo usuário via API:
    ```bash
-   curl -X POST http://localhost:3001/api/auth/register \
+   curl -X POST http://localhost:3000/api/auth/register \
      -H "Content-Type: application/json" \
      -d '{"username":"admin","password":"senha123"}'
    ```
@@ -258,13 +258,13 @@ updated_at TIMESTAMP WITH TIME ZONE
 O projeto utiliza 2 containers:
 
 1. **database** (PostgreSQL 16):
-   - Porta: 5430 (host) → 5432 (container)
+   - Porta: 5432 (host) → 5432 (container)
    - Volume persistente para dados
    - Healthcheck configurado
 
 2. **app** (Frontend + Backend unificado):
-   - Frontend (Nginx): porta 9091 (host) → 80 (container)
-   - Backend (Node.js): porta 3001 (host) → 3000 (container)
+   - Frontend (Nginx): porta 80 (host) → 80 (container)
+   - Backend (Node.js): porta 3000 (host) → 3000 (container)
    - Multi-stage build otimizado
    - Supervisord gerencia ambos os processos
 
@@ -297,14 +297,14 @@ Crie um arquivo `.env` na raiz do projeto para customizar (opcional):
 DB_NAME=estacionamento
 DB_USER=postgres
 DB_PASSWORD=postgres123
-DB_PORT=5430
+DB_PORT=5432
 
 # Application
-APP_PORT=9091
-BACKEND_PORT=3001
+APP_PORT=80
+BACKEND_PORT=3000
 JWT_SECRET=seu-segredo-aqui
 JWT_EXPIRES_IN=24h
-FRONTEND_URL=http://localhost:9091
+FRONTEND_URL=http://localhost
 ```
 
 ## Development server
@@ -412,9 +412,9 @@ Stop Previous Deployment → Deploy → Health Check → Smoke Tests
 ### Acesso Pós-Deploy
 
 Após build bem-sucedido:
-- Frontend: http://localhost:9091
-- Backend: http://localhost:3001
-- Database: localhost:5430
+- Frontend: http://localhost
+- Backend: http://localhost:3000
+- Database: localhost:5432
 
 ## Additional Resources
 
@@ -437,14 +437,14 @@ sudo systemctl status postgresql
 
 3. Teste a conexão manualmente:
 ```bash
-psql -U postgres -d estacionamento -h localhost -p 5430
+psql -U postgres -d estacionamento -h localhost -p 5432
 ```
 
 ### Frontend não conecta ao backend
 
 1. Verifique se o backend está rodando:
 ```bash
-curl http://localhost:3001/health
+curl http://localhost:3000/health
 ```
 
 2. Verifique o CORS no backend (deve aceitar requisições de `http://localhost:4200`)
@@ -459,9 +459,9 @@ curl http://localhost:3001/health
 
 ### Docker: Container app não inicia
 
-1. Verifique se a porta 9091 já está em uso:
+1. Verifique se a porta 80 já está em uso:
 ```bash
-sudo lsof -i :9091
+sudo lsof -i :80
 ```
 
 2. Aguarde o healthcheck do container database completar:
